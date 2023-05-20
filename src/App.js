@@ -1,4 +1,4 @@
-import React, { useContext} from "react";
+import React, {useEffect, useContext} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import GlobalState from './context/global/globalState';
 import {CircularProgress, Typography, Link, Box, CssBaseline} from '@mui/material';
@@ -25,8 +25,17 @@ const GettingRoutes = () => {
   const globalContext = useContext(GlobalContext);
 
   const { 
+    reloadPodcastList,
+    setLoading
   } = globalContext;
 
+    useEffect(() => {
+      const init = async () =>{
+        await setLoading();
+        await reloadPodcastList();
+      }
+      
+      init();
     }, []);
   return (
     
