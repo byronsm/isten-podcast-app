@@ -8,6 +8,7 @@ import {
     SET_LAST_PODCAST_LIST,
     SET_LOADING,
     SET_PODCAST_LIST_FILTERED,
+    SET_PODCAST_LOADED
     
 } from '../../types';
 
@@ -102,6 +103,52 @@ const GlobalState = props => {
             });
         }
     }
+
+    const _loadPodcastByAPI = (podcast) => {
+        
+        if (podcast){
+            const timeToExpirate = new Date(podcast.podcastEpisodesExpirationDate) - new Date();
+            if (!podcast.podcastEpisodesExpirationDate || !podcast.episodes ||  timeToExpirate <= 0) {
+                return true;
+            } 
+            
+        }
+        
+        return false;
+    }
+
+    const getPodcastDetail = async (id) => {
+
+        try {
+
+            let podcast = state.podcastList?.entry.find(podcast => podcast.id.attributes["im:id"] === id)
+
+            if(_loadPodcastByAPI(podcast)){
+                const contents = await API.getPodcastDetail(id),
+                    newTimeLastUpdate = new Date(),
+                    podcastEpisodesExpirationDate = _addHoursToDate(newTimeLastUpdate);
+                
+                podcast.episodes = contents;
+                podcast.podcastEpisodesExpirationDate = podcastEpisodesExpirationDate;
+                localStorage.setItem("podcastList",JSON.stringify(state.podcastList));
+                dispatch({
+                    type: SET_PODCAST_LOADED,
+                    podcastList: state.podcastList
+                });
+
+            } else if (podcast) {
+                setLoading(false);
+            }
+            
+            
+        } catch (error) {
+            console.error(error)            
+            dispatch({
+                type: ERROR,
+            });
+        }
+    }
+
     return(
         <GlobalContext.Provider
             value={{
@@ -115,6 +162,7 @@ const GlobalState = props => {
                 getLastPodcastList,
                 reloadPodcastList,
                 setLoading,
+                getPodcastDetail
             }}
         >{props.children}
 

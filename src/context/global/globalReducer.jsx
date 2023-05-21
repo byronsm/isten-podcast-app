@@ -3,6 +3,7 @@ import {
     SET_LAST_PODCAST_LIST,
     SET_LOADING,
     SET_PODCAST_LIST_FILTERED,
+    SET_PODCAST_LOADED
 } from '../../types';
 
 const GlobalReducer = (state, action) => {
@@ -27,6 +28,12 @@ const GlobalReducer = (state, action) => {
                 ...state,
                 filteredPodcastList: action.filteredPodcastList,
                 podcastListLength:  action.filteredPodcastList.length,
+                loading:false
+            }
+         case SET_PODCAST_LOADED:
+            return {
+                ...state,
+                podcastList: action.podcastList,
                 loading:false
             }
         case ERROR:
