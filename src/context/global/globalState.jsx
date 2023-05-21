@@ -7,6 +7,7 @@ import {
     ERROR,
     SET_LAST_PODCAST_LIST,
     SET_LOADING,
+    SET_PODCAST_LIST_FILTERED,
     
 } from '../../types';
 
@@ -46,6 +47,20 @@ const GlobalState = props => {
 
     const _addHoursToDate = (date, hours = DEFAULT_HOURS_CACHE) => {
         return new Date(date.getTime() + (hours * 60 * 60 * 1000))
+    }
+
+    const filterPodcastByText = (text) => {
+        const propsToSearch = ["im:name", "im:artist", "title", "summary"];
+        const filteredPodcastList =  state.podcastList.entry.filter(item => {    
+            return propsToSearch.some(prop => {
+                const valor = item[prop].label;
+                return valor?.toLowerCase().includes(text.toLowerCase());
+            });
+        });
+        dispatch({
+            type: SET_PODCAST_LIST_FILTERED,
+            filteredPodcastList: filteredPodcastList,
+        });
     }
 
     const reloadPodcastList = (listExpirationDate = state.listExpirationDate) => {
